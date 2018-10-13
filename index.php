@@ -53,23 +53,14 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     <a href="#" class="w3-bar-item w3-button">Blazers</a>
     <a href="#" class="w3-bar-item w3-button">Shoes</a-->
   </div>
-  <?php
-    if($_SESSION['status'] == NULL){
-      echo '<a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById(';
-      echo "'login').style.display='block'";
-      echo '">Login</a> ';
-    }else{
-      echo '<a class="w3-bar-item w3-button w3-padding" href="logout.php"> Logout </a>';
-    }
-  ?>
-  
+
 </nav>
 
-<!-- Top menu on small screens -->
+<!-- Top menu on small screens
 <header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
   <div class="w3-bar-item w3-padding-24 w3-wide">LOGO</div>
   <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>
-</header>
+</header> -->
 
 <!-- Overlay effect when opening sidebar on small screens -->
 <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
@@ -84,6 +75,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   <header class="w3-container w3-xlarge">
     <!-- <p class="w3-left">Beverage</p> -->
     <p class="w3-right">
+
       <?php
 
         if($_SESSION['status'] == 'admin'){            
@@ -97,7 +89,20 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 
       ?>
        <i class="fa fa-search"  onclick="document.getElementById('search').style.display='block'"></i> 
+
+       
+      <?php
+        if($_SESSION['status'] == NULL){
+          echo '<a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById(';
+          echo "'login').style.display='block'";
+          echo '">Login</a> ';
+        }else{
+          echo '<a class="w3-bar-item w3-button w3-padding" href="logout.php"> Logout </a>';
+        }
+        ?>
     </p>
+
+    
   </header>
 
 
