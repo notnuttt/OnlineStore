@@ -1,6 +1,5 @@
 <?php
     session_start();
     session_destroy();
-    header("Location: index.php"); /* Redirect browser */
-    // exit();
+    header("Location: index.php");
 ?>

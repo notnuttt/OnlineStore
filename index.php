@@ -1,15 +1,27 @@
 <?php
 error_reporting(0);
 ini_set('display_errors', 0);
-  session_start();
-  include("conn.php");
-  echo $_SESSION['name'];
-  echo $_SESSION['status'];
+session_start();
+include("conn.php");
 
-  $sql_query_food = 'SELECT * FROM MENU WHERE 1';
-  $query_food = mysqli_query($conn, $sql_query_food);
-  $query_food2 = mysqli_query($conn, $sql_query_food);
-  
+$sql_query_food = 'SELECT * FROM MENU WHERE 1';
+$query_food = mysqli_query($conn, $sql_query_food);
+$query_food2 = mysqli_query($conn, $sql_query_food);
+
+$username = $_SESSION['username'];
+$shopping_cart_name = $username."_shopping_cart";
+$amountItems = 0;
+if(isset($_COOKIE[$shopping_cart_name])){
+  $total = 0;
+  $cookie_data = stripslashes($_COOKIE[$shopping_cart_name]);
+  $cart_data = json_decode($cookie_data, true);
+  foreach($cart_data as $keys => $values){
+    $amountItems++;
+  }
+}
+
+
+
 ?>
 <!DOCTYPE html>
 
@@ -35,32 +47,24 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     <h3 class="w3-wide"><b>N&N Café</b></h3>
   </div>
   <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
-    <!-- <a href="food.php" class="w3-bar-item w3-button">Food</a>
-    <a href="dessert.php" class="w3-bar-item w3-button">Dessert</a> -->
     <a href="#" class="w3-bar-item w3-button">Menu</a>
-    
-    <!--a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-white w3-left-align" id="myBtn">
-      Jeans <i class="fa fa-caret-down"></i>
-    </a>
-    <div id="demoAcc" class="w3-bar-block w3-hide w3-padding-large w3-medium">
-      <a href="#" class="w3-bar-item w3-button w3-light-grey"><i class="fa fa-caret-right w3-margin-right"></i>Skinny</a>
-      <a href="#" class="w3-bar-item w3-button">Relaxed</a>
-      <a href="#" class="w3-bar-item w3-button">Bootcut</a>
-      <a href="#" class="w3-bar-item w3-button">Straight</a>
-    </div>
-    <a href="#" class="w3-bar-item w3-button">Jackets</a>
-    <a href="#" class="w3-bar-item w3-button">Gymwear</a>
-    <a href="#" class="w3-bar-item w3-button">Blazers</a>
-    <a href="#" class="w3-bar-item w3-button">Shoes</a-->
   </div>
-
+  <?php
+    if($_SESSION['status'] == NULL){ ?>
+      <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('login').style.display='block'">Login</a>
+<?php }else{ ?>
+    <a class="w3-bar-item w3-button w3-padding" style="color: grey;">Hello! <br><?php echo $_SESSION['name']; ?> </a>
+      <a class="w3-bar-item w3-button w3-padding" href="logout.php"> Logout </a>
+<?php }
+  ?>
+  
 </nav>
 
-<!-- Top menu on small screens
+<!-- Top menu on small screens -->
 <header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
   <div class="w3-bar-item w3-padding-24 w3-wide">LOGO</div>
   <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>
-</header> -->
+</header>
 
 <!-- Overlay effect when opening sidebar on small screens -->
 <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
@@ -75,34 +79,14 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   <header class="w3-container w3-xlarge">
     <!-- <p class="w3-left">Beverage</p> -->
     <p class="w3-right">
-
       <?php
-
-        if($_SESSION['status'] == 'admin'){            
-          echo '<button onclick="document.getElementById(';
-          echo "'addItem').style.display='block'";
-          echo '" > Add+ </button>';
-          
-        }else if($_SESSION['status'] == 'user'){
-          echo '<i class="fa fa-shopping-cart w3-margin-right"></i>';
-        }
-
-      ?>
-       <i class="fa fa-search"  onclick="document.getElementById('search').style.display='block'"></i> 
-
-       
-      <?php
-        if($_SESSION['status'] == NULL){
-          echo '<a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById(';
-          echo "'login').style.display='block'";
-          echo '">Login</a> ';
-        }else{
-          echo '<a class="w3-bar-item w3-button w3-padding" href="logout.php"> Logout </a>';
-        }
-        ?>
+        if($_SESSION['status'] == 'admin'){?>
+         <i class="fa fa-plus w3-margin-right w3-button" onclick="document.getElementById('addItem').style.display='block'"></i>          
+   <?php     }else if($_SESSION['status'] == 'user'){ ?>
+            <i class="fa fa-shopping-cart w3-margin-right w3-button" onclick="document.getElementById('thecart').style.display='block'"><b style="color:red;"><?php echo "   ".$amountItems; ?></b></i>
+        <?php } ?>
+       <i class="fa fa-search w3-button"  onclick="document.getElementById('search').style.display='block'"></i> 
     </p>
-
-    
   </header>
 
 
@@ -112,25 +96,34 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   
   <?php
     while($array_food = mysqli_fetch_array($query_food)){
-      $id = $array_food['id'];
-      echo '
+      $id = $array_food['id']; ?>
       <div class="w3-third w3-container">
       <div class="w3-display-container">
-        <img src="'.$array_food['img'].'" style="width:100%; heigh:100%">
+        <img src="<?php echo $array_food['img']; ?>" style="width:100%; heigh:100%">
+        <?php if($_SESSION['status'] == 'admin'){ ?>
         <div class="w3-display-middle w3-display-hover">
-            <button class="w3-button w3-black" onclick="document.getElementById(';
-            echo "'".$id."').style.display='";
-            echo "block'";
-            echo '">Edit</button>';
-            echo ' <form method="POST" action="remove.php">
-                    <input type="hidden" value="'.$id.'" name="id">
-            <input type="submit" value="Remove" class="w3-button w3-black">
+            <button class="w3-button w3-black" onclick="document.getElementById('<?php echo $id; ?>').style.display='block'">Edit</button>
+            <form method="POST" action="remove.php">
+              <input type="hidden" value="<?php echo $id; ?>" name="id">
+             <input type="submit" value="Remove" class="w3-button w3-black">
             </form>
         </div>
+        <?php }else if($_SESSION['status'] == 'user'){ ?>
+          <div class="w3-display-middle w3-display-hover">
+            <form method="POST" action="addCart.php">
+            <input type="hidden" value="<?php echo $id; ?>" name="id">
+            <input type="hidden" value="<?php echo $array_food['name']; ?>" name="name">
+              <input type="hidden" value="<?php echo $array_food['price']; ?>" name="price">
+              <input type="hidden" value="<?php echo $array_food['img']; ?>" name="image">
+              <input type="hidden" value="1" name="quantity">
+             <input type="submit" value="Add to cart" class="w3-button w3-black">
+            </form>
         </div>
-        <p>'.$array_food['name'].'<br><b>'.$array_food['price'].' Baht.</b></p>
-      </div>';
-    }
+
+        <?php } ?>  </div>
+        <p><?php echo $array_food['name']; ?><br><b><?php echo $array_food['price']; ?> Baht.</b></p>
+      </div>
+<?php    }
   ?>
   </div>
     
@@ -141,6 +134,8 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   <!-- End page content -->
 </div>
 
+
+<?php if($_SESSION['status'] == NULL){ ?>
 <!-- Login Modal -->
 <div id="login" class="w3-modal">
   <div class="w3-modal-content w3-animate-zoom" style="padding:32px">
@@ -158,6 +153,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     </div>
   </div>
 </div>
+<?php } ?>
 
 <!-- Search Modal -->
 <div id="search" class="w3-modal">
@@ -175,6 +171,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   </div>
 </div>
 
+<?php if($_SESSION['status'] == 'admin'){ ?>
 <!-- AddItem Modal -->
 <div id="addItem" class="w3-modal">
   <div class="w3-modal-content w3-animate-zoom" style="padding:32px">
@@ -194,34 +191,77 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     </div>
   </div>
 </div>
+<?php } ?>
 
 <!-- Item Modal -->
 <?php
       while($array_food = mysqli_fetch_array($query_food2)){
-        $id = $array_food['id'];
-       echo '<div id="'.$id.'" class="w3-modal">
+        $id = $array_food['id']; ?>
+       <div id="<?php echo $id; ?>" class="w3-modal">
           <div class="w3-modal-content w3-animate-zoom" style="padding:32px">
             <div class="w3-container w3-white w3-center">
-              <i onclick="document.getElementById(';
-              echo "'".$id."').style.display='none'";
-              echo '" class="fa fa-remove w3-right w3-button w3-transparent w3-xxlarge"></i>
-              <h2 class="w3-wide" >Add New ITEM</h2>
+              <i onclick="document.getElementById('<?php echo $id; ?>').style.display='none'" class="fa fa-remove w3-right w3-button w3-transparent w3-xxlarge"></i>
+              <h2 class="w3-wide" >Update <?php echo $array_food['name']; ?></h2>
               <p style="align:center">Please fill the item details.</p>
               <form method="POST" action="update.php" enctype="multipart/form-data">
-              <input type ="hidden" name="id" value="'.$id.'">
-                <p><input class="w3-input w3-border" type="text" placeholder="Enter Name" name="itemName" value="'.$array_food['name'].'"></p>
-                <p><input class="w3-input w3-border" type="text" placeholder="Price" name="price" value="'.$array_food['price'].'"></p>
-                <p><input class="w3-input w3-border" type="text" placeholder="Enter Desciption (If any)" name="itemDes" value="'.$array_food['des'].'"></p>
-                <p><input class="w3-input w3-border" type="file" placeholder="Enter Image path" name="imgage"></p>
-                <input type="submit" class="w3-button w3-padding-large w3-red w3-margin-bottom" onclick="document.getElementById(';
-                echo "'".$id."').style.display='none'";
-                echo '" value="Update">
+              <input type ="hidden" name="id" value="<?php echo $id; ?>">
+                <p><input class="w3-input w3-border" type="text" placeholder="Enter Name" name="itemName" value="<?php echo $array_food['name']; ?>"></p>
+                <p><input class="w3-input w3-border" type="number" placeholder="Price" name="price" value="<?php echo $array_food['price']; ?>"></p>
+                <p><input class="w3-input w3-border" type="text" placeholder="Enter Desciption (If any)" name="itemDes" value="<?php echo $array_food['des']; ?>"></p>
+                <input type="submit" class="w3-button w3-padding-large w3-red w3-margin-bottom" onclick="document.getElementById('<?php echo $id; ?>').style.display='none'" value="Update">
                 </form>
-      
               </div>
             </div>
-          </div>';
-      }
+          </div>
+   <?php   }
+
+?>
+
+
+<?php
+if(isset($_COOKIE[$shopping_cart_name])){
+  $total = 0;
+  $cookie_data = stripslashes($_COOKIE[$shopping_cart_name]);
+  $cart_data = json_decode($cookie_data, true); ?>
+    <div id="thecart" class="w3-modal">
+          <div class="w3-modal-content w3-animate-zoom" style="padding:32px">
+            <div class="w3-container w3-white w3-center">
+              <i onclick="document.getElementById('thecart').style.display='none'" class="fa fa-remove w3-right w3-button w3-transparent w3-xxlarge"></i>
+              <h2 class="w3-wide" >Items in cart</h2>
+              <p style="align:center">Please checkout.</p>
+              <table align="center">
+<?php
+  foreach($cart_data as $keys => $values){ ?>
+              <tr>
+                <td><?php echo $values["item_name"]; ?></td>
+                <!-- <td><?php echo $values["item_quantity"]; ?></td> -->
+                <td>$ <?php echo $values["item_price"]; ?></td>
+                <!-- <td>$ <?php echo number_format($values["item_quantity"] * $values["item_price"], 2);?></td> -->
+                <!-- <td><a href="index.php?action=delete&id=<?php echo $values["item_id"]; ?>"><span class="text-danger">Remove</span></a></td> -->
+              </tr>
+              
+<?php
+    } ?>
+    </table>
+<form method="POST" action="checkout_cart.php" enctype="multipart/form-data">
+                <input type="submit" class="w3-button w3-padding-large w3-red w3-margin-bottom" onclick="document.getElementById('thecart').style.display='none'" value="Checkout">
+                </form>
+              </div>
+            </div>
+          </div>
+
+<?php }else{ ?>
+  <div id="thecart" class="w3-modal">
+          <div class="w3-modal-content w3-animate-zoom" style="padding:32px">
+            <div class="w3-container w3-white w3-center">
+              <i onclick="document.getElementById('thecart').style.display='none'" class="fa fa-remove w3-right w3-button w3-transparent w3-xxlarge"></i>
+              <h2 class="w3-wide" >Items in cart</h2>
+              <p style="align:center">Empty Cart</p>
+              </div>
+            </div>
+          </div>
+<?php
+}
 
 ?>
 
@@ -239,8 +279,6 @@ function myAccFunc() {
 
 // Click on the "Jeans" link on page load to open the accordion for demo purposes
 document.getElementById("myBtn").click();
-
-
 // Script to open and close sidebar
 function w3_open() {
     document.getElementById("mySidebar").style.display = "block";

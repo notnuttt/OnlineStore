@@ -6,7 +6,7 @@
 	$price = $_REQUEST['price'];
 	$des = $_REQUEST['itemDes'];
 
-	// insert new item
+	// Update item
 	$sql_update = 'UPDATE `menu` SET `name`= "'.$name.'",`price`= "'.$price.'",`des`= "'.des.'" WHERE ID = "'.$id.'";';
 	$query = mysqli_query($conn, $sql_update);
 

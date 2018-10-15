@@ -17,10 +17,9 @@ if($row){
     $_SESSION['username'] = $row['username'];
     $_SESSION['status'] = $row['status'];
     session_write_close();
-    printf('<script> alert("Welcome %s!"); window.location.replace("/OnlineStore/index.php");</script>',$_SESSION['name']);
-
+    header("Location: index.php");
 }else{
-	//echo '<script> alert("Something went wrong!"); window.location.replace("/OnlineStore/index.php"); </script>';
+	echo '<script> alert("Something went wrong! Please Login again."); window.location.replace("/OnlineStore/index.php"); </script>';
 }
 
 ?>
