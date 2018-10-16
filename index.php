@@ -10,16 +10,20 @@ $query_food2 = mysqli_query($conn, $sql_query_food);
 
 $username = $_SESSION['username'];
 $shopping_cart_name = $username."_shopping_cart";
+
+$total = 0;
 $amountItems = 0;
 if(isset($_COOKIE[$shopping_cart_name])){
-  $total = 0;
+  
   $cookie_data = stripslashes($_COOKIE[$shopping_cart_name]);
   $cart_data = json_decode($cookie_data, true);
+
   foreach($cart_data as $keys => $values){
+    $total += $values["item_quantity"] * $values["item_price"];
     $amountItems++;
   }
 }
-
+echo $total;
 
 
 ?>
@@ -49,14 +53,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
     <a href="#" class="w3-bar-item w3-button">Menu</a>
   </div>
-  <?php
-    if($_SESSION['status'] == NULL){ ?>
-      <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('login').style.display='block'">Login</a>
-<?php }else{ ?>
-    <a class="w3-bar-item w3-button w3-padding" style="color: grey;">Hello! <br><?php echo $_SESSION['name']; ?> </a>
-      <a class="w3-bar-item w3-button w3-padding" href="logout.php"> Logout </a>
-<?php }
-  ?>
+ 
   
 </nav>
 
@@ -86,6 +83,15 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
             <i class="fa fa-shopping-cart w3-margin-right w3-button" onclick="document.getElementById('thecart').style.display='block'"><b style="color:red;"><?php echo "   ".$amountItems; ?></b></i>
         <?php } ?>
        <i class="fa fa-search w3-button"  onclick="document.getElementById('search').style.display='block'"></i> 
+
+        <?php
+    if($_SESSION['status'] == NULL){ ?>
+      <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('login').style.display='block'">Login</a>
+<?php }else{ ?>
+    <a class="w3-bar-item w3-button w3-padding" style="color: grey;">Hello! <?php echo $_SESSION['username']; ?> </a>
+      <a class="w3-bar-item w3-button w3-padding" href="logout.php"> Logout </a>
+<?php }
+  ?>
     </p>
   </header>
 
@@ -220,7 +226,6 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 
 <?php
 if(isset($_COOKIE[$shopping_cart_name])){
-  $total = 0;
   $cookie_data = stripslashes($_COOKIE[$shopping_cart_name]);
   $cart_data = json_decode($cookie_data, true); ?>
     <div id="thecart" class="w3-modal">
@@ -234,8 +239,8 @@ if(isset($_COOKIE[$shopping_cart_name])){
   foreach($cart_data as $keys => $values){ ?>
               <tr>
                 <td><?php echo $values["item_name"]; ?></td>
-                <!-- <td><?php echo $values["item_quantity"]; ?></td> -->
-                <td>$ <?php echo $values["item_price"]; ?></td>
+                <td><?php echo $values["item_quantity"]; ?></td>
+                <td> <?php echo $values["item_price"]; ?> Baht.</td>
                 <!-- <td>$ <?php echo number_format($values["item_quantity"] * $values["item_price"], 2);?></td> -->
                 <!-- <td><a href="index.php?action=delete&id=<?php echo $values["item_id"]; ?>"><span class="text-danger">Remove</span></a></td> -->
               </tr>
@@ -243,6 +248,7 @@ if(isset($_COOKIE[$shopping_cart_name])){
 <?php
     } ?>
     </table>
+    <p>Total: <?php echo $total; ?> Baht.</p>
 <form method="POST" action="checkout_cart.php" enctype="multipart/form-data">
                 <input type="submit" class="w3-button w3-padding-large w3-red w3-margin-bottom" onclick="document.getElementById('thecart').style.display='none'" value="Checkout">
                 </form>
