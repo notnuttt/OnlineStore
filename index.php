@@ -239,8 +239,9 @@ if(isset($_COOKIE[$shopping_cart_name])){
   foreach($cart_data as $keys => $values){ ?>
               <tr>
                 <td><?php echo $values["item_name"]; ?></td>
-                <td><?php echo $values["item_quantity"]; ?></td>
                 <td> <?php echo $values["item_price"]; ?> Baht.</td>
+                <td>X<?php echo $values["item_quantity"]; ?></td>
+                
                 <!-- <td>$ <?php echo number_format($values["item_quantity"] * $values["item_price"], 2);?></td> -->
                 <!-- <td><a href="index.php?action=delete&id=<?php echo $values["item_id"]; ?>"><span class="text-danger">Remove</span></a></td> -->
               </tr>
