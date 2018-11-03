@@ -74,7 +74,6 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
   
   <!-- Top header -->
   <header class="w3-container w3-xlarge">
-    <!-- <p class="w3-left">Beverage</p> -->
     <p class="w3-right">
       <?php
         if($_SESSION['status'] == 'admin'){?>
@@ -199,7 +198,7 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
 </div>
 <?php } ?>
 
-<!-- Item Modal -->
+<!-- Update Item Modal -->
 <?php
       while($array_food = mysqli_fetch_array($query_food2)){
         $id = $array_food['id']; ?>
